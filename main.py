@@ -23,6 +23,10 @@ from transformers import XLMRobertaTokenizer, XLMRobertaForMaskedLM
 xlmroberta_tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base')
 xlmroberta_model = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-base').eval()
 
+xlmroberta_tokenizer_large = XLMRobertaTokenizer.from_pretrained('xlm-roberta-large')
+xlmroberta_model_large = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-large').eval()
+
+
 from transformers import BartTokenizer, BartForConditionalGeneration
 bart_tokenizer = BartTokenizer.from_pretrained('bart-large')
 bart_model = BartForConditionalGeneration.from_pretrained('bart-large').eval()
@@ -96,6 +100,12 @@ def get_all_predictions(text_sentence, top_clean=5):
         predict = xlmroberta_model(input_ids)[0]
     xlm = decode(xlmroberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
+    # ========================= XLM ROBERTA Large =================================
+    input_ids, mask_idx = encode(xlmroberta_tokenizer_large, text_sentence, add_special_tokens=True)
+    with torch.no_grad():
+        predict = xlmroberta_model_large(input_ids)[0]
+    xlmroberta_large = decode(xlmroberta_tokenizer_large, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+
     # ========================= BART =================================
     input_ids, mask_idx = encode(bart_tokenizer, text_sentence, add_special_tokens=True)
     with torch.no_grad():
@@ -118,7 +128,8 @@ def get_all_predictions(text_sentence, top_clean=5):
             'bert_mlm_uncased':bert_mlm_uncased,
             'bert_mlm_cased':bert_mlm_cased,
             'xlnet': xlnet,
-            'xlm': xlm,
+            'xlm_roberta_base': xlm,
+            'xlm_roberta_large' : xlmroberta_large,
             'bart': bart,
             'electra': electra,
             'roberta': roberta}
