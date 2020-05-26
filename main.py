@@ -6,7 +6,7 @@ from transformers import BertTokenizer, BertForMaskedLM
 bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
 
-r
+
 from transformers import XLNetTokenizer, XLNetLMHeadModel
 xlnet_tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
 xlnet_model = XLNetLMHeadModel.from_pretrained('xlnet-base-cased').eval()
