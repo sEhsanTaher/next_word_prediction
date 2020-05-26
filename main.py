@@ -7,6 +7,14 @@ bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
 
 
+bert_tokenizer_mlm_uncased = BertTokenizer.from_pretrained('bert-base-multilingual-uncased')
+bert_model_mlm_uncased = BertForMaskedLM.from_pretrained('bert-base-multilingual-uncased').eval()
+
+bert_tokenizer_mlm_cased = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+bert_model_mlm_cased = BertForMaskedLM.from_pretrained('bert-base-multilingual-cased').eval()
+
+
+
 from transformers import XLNetTokenizer, XLNetLMHeadModel
 xlnet_tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
 xlnet_model = XLNetLMHeadModel.from_pretrained('xlnet-base-cased').eval()
