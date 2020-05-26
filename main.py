@@ -2,42 +2,42 @@
 import torch
 import string
 
-from transformers import BertTokenizer, BertForMaskedLM
-bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
+# from transformers import BertTokenizer, BertForMaskedLM
+# bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+# bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
 
 
-bert_tokenizer_mlm_uncased = BertTokenizer.from_pretrained('bert-base-multilingual-uncased')
-bert_model_mlm_uncased = BertForMaskedLM.from_pretrained('bert-base-multilingual-uncased').eval()
+# bert_tokenizer_mlm_uncased = BertTokenizer.from_pretrained('bert-base-multilingual-uncased')
+# bert_model_mlm_uncased = BertForMaskedLM.from_pretrained('bert-base-multilingual-uncased').eval()
 
-bert_tokenizer_mlm_cased = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
-bert_model_mlm_cased = BertForMaskedLM.from_pretrained('bert-base-multilingual-cased').eval()
-
-
-
-from transformers import XLNetTokenizer, XLNetLMHeadModel
-xlnet_tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
-xlnet_model = XLNetLMHeadModel.from_pretrained('xlnet-base-cased').eval()
-
-from transformers import XLMRobertaTokenizer, XLMRobertaForMaskedLM
-xlmroberta_tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base')
-xlmroberta_model = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-base').eval()
-
-xlmroberta_tokenizer_large = XLMRobertaTokenizer.from_pretrained('xlm-roberta-large')
-xlmroberta_model_large = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-large').eval()
+# bert_tokenizer_mlm_cased = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+# bert_model_mlm_cased = BertForMaskedLM.from_pretrained('bert-base-multilingual-cased').eval()
 
 
-from transformers import BartTokenizer, BartForConditionalGeneration
-bart_tokenizer = BartTokenizer.from_pretrained('bart-large')
-bart_model = BartForConditionalGeneration.from_pretrained('bart-large').eval()
 
-from transformers import ElectraTokenizer, ElectraForMaskedLM
-electra_tokenizer = ElectraTokenizer.from_pretrained('google/electra-small-generator')
-electra_model = ElectraForMaskedLM.from_pretrained('google/electra-small-generator').eval()
+# from transformers import XLNetTokenizer, XLNetLMHeadModel
+# xlnet_tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
+# xlnet_model = XLNetLMHeadModel.from_pretrained('xlnet-base-cased').eval()
 
-from transformers import RobertaTokenizer, RobertaForMaskedLM
-roberta_tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
-roberta_model = RobertaForMaskedLM.from_pretrained('roberta-base').eval()
+# from transformers import XLMRobertaTokenizer, XLMRobertaForMaskedLM
+# xlmroberta_tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base')
+# xlmroberta_model = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-base').eval()
+
+# xlmroberta_tokenizer_large = XLMRobertaTokenizer.from_pretrained('xlm-roberta-large')
+# xlmroberta_model_large = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-large').eval()
+
+
+# from transformers import BartTokenizer, BartForConditionalGeneration
+# bart_tokenizer = BartTokenizer.from_pretrained('bart-large')
+# bart_model = BartForConditionalGeneration.from_pretrained('bart-large').eval()
+
+# from transformers import ElectraTokenizer, ElectraForMaskedLM
+# electra_tokenizer = ElectraTokenizer.from_pretrained('google/electra-small-generator')
+# electra_model = ElectraForMaskedLM.from_pretrained('google/electra-small-generator').eval()
+
+# from transformers import RobertaTokenizer, RobertaForMaskedLM
+# roberta_tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+# roberta_model = RobertaForMaskedLM.from_pretrained('roberta-base').eval()
 
 top_k = 10
 
@@ -66,64 +66,84 @@ def encode(tokenizer, text_sentence, add_special_tokens=True):
 def get_all_predictions(text_sentence, top_clean=5):
     # ========================= BERT =================================
     print(text_sentence)
-    input_ids, mask_idx = encode(bert_tokenizer, text_sentence)
-    with torch.no_grad():
-        predict = bert_model(input_ids)[0]
-    bert = decode(bert_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(bert_tokenizer, text_sentence)
+        with torch.no_grad():
+            predict = bert_model(input_ids)[0]
+        bert = decode(bert_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+      bert = ""  
     #### BERT MLM uncased:
-    input_ids, mask_idx = encode(bert_tokenizer_mlm_uncased, text_sentence)
-    with torch.no_grad():
-        predict = bert_model_mlm_uncased(input_ids)[0]
-    bert_mlm_uncased = decode(bert_tokenizer_mlm_uncased, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(bert_tokenizer_mlm_uncased, text_sentence)
+        with torch.no_grad():
+            predict = bert_model_mlm_uncased(input_ids)[0]
+        bert_mlm_uncased = decode(bert_tokenizer_mlm_uncased, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        bert_mlm_uncased = ""
     #### BERT MLM cased:
-    input_ids, mask_idx = encode(bert_tokenizer_mlm_cased, text_sentence)
-    with torch.no_grad():
-        predict = bert_model_mlm_cased(input_ids)[0]
-    bert_mlm_cased = decode(bert_tokenizer_mlm_cased, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(bert_tokenizer_mlm_cased, text_sentence)
+        with torch.no_grad():
+            predict = bert_model_mlm_cased(input_ids)[0]
+        bert_mlm_cased = decode(bert_tokenizer_mlm_cased, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        bert_mlm_cased = ""
     # ========================= XLNET LARGE =================================
-    input_ids, mask_idx = encode(xlnet_tokenizer, text_sentence, False)
-    perm_mask = torch.zeros((1, input_ids.shape[1], input_ids.shape[1]), dtype=torch.float)
-    perm_mask[:, :, mask_idx] = 1.0  # Previous tokens don't see last token
-    target_mapping = torch.zeros((1, 1, input_ids.shape[1]), dtype=torch.float)  # Shape [1, 1, seq_length] => let's predict one token
-    target_mapping[0, 0, mask_idx] = 1.0  # Our first (and only) prediction will be the last token of the sequence (the masked token)
+    try:
+        input_ids, mask_idx = encode(xlnet_tokenizer, text_sentence, False)
+        perm_mask = torch.zeros((1, input_ids.shape[1], input_ids.shape[1]), dtype=torch.float)
+        perm_mask[:, :, mask_idx] = 1.0  # Previous tokens don't see last token
+        target_mapping = torch.zeros((1, 1, input_ids.shape[1]), dtype=torch.float)  # Shape [1, 1, seq_length] => let's predict one token
+        target_mapping[0, 0, mask_idx] = 1.0  # Our first (and only) prediction will be the last token of the sequence (the masked token)
 
-    with torch.no_grad():
-        predict = xlnet_model(input_ids, perm_mask=perm_mask, target_mapping=target_mapping)[0]
-    xlnet = decode(xlnet_tokenizer, predict[0, 0, :].topk(top_k).indices.tolist(), top_clean)
-
+        with torch.no_grad():
+            predict = xlnet_model(input_ids, perm_mask=perm_mask, target_mapping=target_mapping)[0]
+        xlnet = decode(xlnet_tokenizer, predict[0, 0, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        xlnet = ""
     # ========================= XLM ROBERTA BASE =================================
-    input_ids, mask_idx = encode(xlmroberta_tokenizer, text_sentence, add_special_tokens=True)
-    with torch.no_grad():
-        predict = xlmroberta_model(input_ids)[0]
-    xlm = decode(xlmroberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(xlmroberta_tokenizer, text_sentence, add_special_tokens=True)
+        with torch.no_grad():
+            predict = xlmroberta_model(input_ids)[0]
+        xlm = decode(xlmroberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        xlm=""
     # ========================= XLM ROBERTA Large =================================
-    input_ids, mask_idx = encode(xlmroberta_tokenizer_large, text_sentence, add_special_tokens=True)
-    with torch.no_grad():
-        predict = xlmroberta_model_large(input_ids)[0]
-    xlmroberta_large = decode(xlmroberta_tokenizer_large, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(xlmroberta_tokenizer_large, text_sentence, add_special_tokens=True)
+        with torch.no_grad():
+            predict = xlmroberta_model_large(input_ids)[0]
+        xlmroberta_large = decode(xlmroberta_tokenizer_large, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        xlmroberta_large = ""
     # ========================= BART =================================
-    input_ids, mask_idx = encode(bart_tokenizer, text_sentence, add_special_tokens=True)
-    with torch.no_grad():
-        predict = bart_model(input_ids)[0]
-    bart = decode(bart_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(bart_tokenizer, text_sentence, add_special_tokens=True)
+        with torch.no_grad():
+            predict = bart_model(input_ids)[0]
+        bart = decode(bart_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        bart = ""
     # ========================= ELECTRA =================================
-    input_ids, mask_idx = encode(electra_tokenizer, text_sentence, add_special_tokens=True)
-    with torch.no_grad():
-        predict = electra_model(input_ids)[0]
-    electra = decode(electra_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(electra_tokenizer, text_sentence, add_special_tokens=True)
+        with torch.no_grad():
+            predict = electra_model(input_ids)[0]
+        electra = decode(electra_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        electra=""
     # ========================= ROBERTA =================================
-    input_ids, mask_idx = encode(roberta_tokenizer, text_sentence, add_special_tokens=True)
-    with torch.no_grad():
-        predict = roberta_model(input_ids)[0]
-    roberta = decode(roberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
-
+    try:
+        input_ids, mask_idx = encode(roberta_tokenizer, text_sentence, add_special_tokens=True)
+        with torch.no_grad():
+            predict = roberta_model(input_ids)[0]
+        roberta = decode(roberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    except:
+        roberta=""
+    
+    
     return {'bert': bert,
             'bert_mlm_uncased':bert_mlm_uncased,
             'bert_mlm_cased':bert_mlm_cased,
