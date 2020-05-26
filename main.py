@@ -6,6 +6,7 @@ from transformers import BertTokenizer, BertForMaskedLM
 bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
 
+r
 from transformers import XLNetTokenizer, XLNetLMHeadModel
 xlnet_tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
 xlnet_model = XLNetLMHeadModel.from_pretrained('xlnet-base-cased').eval()
@@ -58,6 +59,18 @@ def get_all_predictions(text_sentence, top_clean=5):
         predict = bert_model(input_ids)[0]
     bert = decode(bert_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
+    #### BERT MLM uncased:
+    input_ids, mask_idx = encode(bert_tokenizer_mlm_uncased, text_sentence)
+    with torch.no_grad():
+        predict = bert_model_mlm_uncased(input_ids)[0]
+    bert_mlm_uncased = decode(bert_tokenizer_mlm_uncased, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+
+    #### BERT MLM cased:
+    input_ids, mask_idx = encode(bert_tokenizer_mlm_cased, text_sentence)
+    with torch.no_grad():
+        predict = bert_model_mlm_cased(input_ids)[0]
+    bert_mlm_cased = decode(bert_tokenizer_mlm_cased, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+
     # ========================= XLNET LARGE =================================
     input_ids, mask_idx = encode(xlnet_tokenizer, text_sentence, False)
     perm_mask = torch.zeros((1, input_ids.shape[1], input_ids.shape[1]), dtype=torch.float)
@@ -94,6 +107,8 @@ def get_all_predictions(text_sentence, top_clean=5):
     roberta = decode(roberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
     return {'bert': bert,
+            'bert_mlm_uncased':bert_mlm_uncased,
+            'bert_mlm_cased':bert_mlm_cased,
             'xlnet': xlnet,
             'xlm': xlm,
             'bart': bart,
